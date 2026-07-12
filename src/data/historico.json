@@ -1,0 +1,1049 @@
+[
+ {
+  "date": "2023-06-25",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 11
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-07-02",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 11
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-07-08",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 12
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-07-16",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 15
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-07-22",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 10
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-07-29",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 12
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-05",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 6
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-12",
+  "period": "descaste",
+  "season": "2023",
+  "counts": {
+   "Conejo": 10
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-20",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 27
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-24",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 8
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-26",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 12
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-08-31",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 16
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-09-02",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 7,
+   "Zurita": 28
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-09-09",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 12,
+   "Zurita": 26
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-09-10",
+  "period": "media_veda",
+  "season": "2023",
+  "counts": {
+   "Torcaz": 1,
+   "Zurita": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-10-14",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 3
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-10-21",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 6,
+   "Torcaz": 1,
+   "Zorzal": 3
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-10-29",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 5,
+   "Perdiz suelta": 9
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-11-01",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 14,
+   "Perdiz suelta": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-11-04",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 5,
+   "Zorzal": 27,
+   "Perdiz suelta": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-11-12",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 2,
+   "Perdiz suelta": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-11-18",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 6,
+   "Zorzal": 25
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-11-26",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Perdiz suelta": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-04",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 41,
+   "Zurita": 3
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-06",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 2,
+   "Perdiz suelta": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-09",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 15
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-17",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Perdiz suelta": 6
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-24",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Zorzal": 5,
+   "Perdiz suelta": 8
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2023-12-30",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 25
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-01-04",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 27
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-01-13",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 30
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-01-20",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 47
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-01-27",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 45,
+   "Griva": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-02-03",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Zorzal": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-02-11",
+  "period": "veda_general",
+  "season": "2023-24",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 52
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-04-27",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-05-11",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-06-09",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 9
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-06-15",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 12
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-06-29",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 11
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-07-07",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 5
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-07-14",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 13
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-07-20",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 11
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-07-27",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 17
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-08-10",
+  "period": "descaste",
+  "season": "2024",
+  "counts": {
+   "Conejo": 9
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-08-22",
+  "period": "media_veda",
+  "season": "2024",
+  "counts": {
+   "Torcaz": 31
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-08-24",
+  "period": "media_veda",
+  "season": "2024",
+  "counts": {
+   "Torcaz": 18
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-08-31",
+  "period": "media_veda",
+  "season": "2024",
+  "counts": {
+   "Torcaz": 5
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-09-01",
+  "period": "media_veda",
+  "season": "2024",
+  "counts": {
+   "Torcaz": 7,
+   "Zurita": 67
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-09-07",
+  "period": "media_veda",
+  "season": "2024",
+  "counts": {
+   "Torcaz": 13,
+   "Zurita": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-10-13",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-10-19",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 10,
+   "Perdiz suelta": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-10-26",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 4,
+   "Zorzal": 20
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-11-02",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 3,
+   "Perdiz suelta": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-11-09",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 4,
+   "Zorzal": 28,
+   "Zurita": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-11-16",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 1,
+   "Perdiz suelta": 4
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-11-23",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 4,
+   "Zorzal": 25
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-12-06",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 4,
+   "Perdiz suelta": 10
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-12-07",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 25,
+   "Perdiz suelta": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-12-14",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Perdiz suelta": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-12-21",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 5,
+   "Perdiz suelta": 12
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2024-12-28",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {},
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-01-04",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 3,
+   "Torcaz": 1,
+   "Perdiz suelta": 6
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-01-11",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 6,
+   "Zorzal": 36
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-01-18",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 3,
+   "Zorzal": 51
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-01-24",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 4,
+   "Zorzal": 31
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-02-01",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 42
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-02-09",
+  "period": "veda_general",
+  "season": "2024-25",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 35
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-08-21",
+  "period": "media_veda",
+  "season": "2025",
+  "counts": {
+   "Torcaz": 16
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-08-23",
+  "period": "media_veda",
+  "season": "2025",
+  "counts": {
+   "Torcaz": 15
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-08-28",
+  "period": "media_veda",
+  "season": "2025",
+  "counts": {
+   "Torcaz": 11
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-09-06",
+  "period": "media_veda",
+  "season": "2025",
+  "counts": {
+   "Torcaz": 9,
+   "Zurita": 5
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-09-07",
+  "period": "media_veda",
+  "season": "2025",
+  "counts": {},
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-10-12",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 2,
+   "Torcaz": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-10-25",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 8,
+   "Zorzal": 20
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-11-01",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 3,
+   "Perdiz suelta": 7
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-11-08",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Torcaz": 1,
+   "Zorzal": 39
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-11-16",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Zorzal": 25
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-11-22",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 5,
+   "Perdiz suelta": 8,
+   "Becada": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-11-29",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Perdiz suelta": 9
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-12-06",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 1,
+   "Perdiz suelta": 5,
+   "Zurita": 2
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-12-13",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {},
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-12-20",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 22
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2025-12-28",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Perdiz suelta": 5
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-01-03",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 1,
+   "Zorzal": 26,
+   "Perdiz suelta": 1
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-01-10",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 3,
+   "Torcaz": 1,
+   "Zorzal": 31
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-01-17",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 6
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-01-24",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {},
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-01-31",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 3,
+   "Zorzal": 54
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ },
+ {
+  "date": "2026-02-08",
+  "period": "veda_general",
+  "season": "2025-26",
+  "counts": {
+   "Conejo": 2,
+   "Zorzal": 47
+  },
+  "km": null,
+  "notes": "",
+  "source": "excel"
+ }
+]
