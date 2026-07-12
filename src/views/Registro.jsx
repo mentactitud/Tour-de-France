@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { PERIODOS, periodoPorFecha, temporadaPara } from '../data/especies.js'
 import { gps } from '../gps.js'
-import { parseGPX, kmDeTrack } from '../utils/geo.js'
+import { parseGPX } from '../utils/geo.js'
 import { comprimirFoto, guardarFotos, compartirFotos } from '../utils/fotos.js'
 
 function hoy() {
@@ -92,11 +92,16 @@ export default function Registro({ editId, onDone, onCancel }) {
     const file = e.target.files?.[0]
     if (!file) return
     try {
-      const track = parseGPX(await file.text())
-      const kmGpx = Math.round(kmDeTrack(track) * 10) / 10
-      setPendGps(p => ({ ...(p || {}), track, km: kmGpx }))
-      setKm(String(kmGpx))
-      setMsgFoto(`✓ GPX importado: ${kmGpx} km`)
+      const gpx = parseGPX(await file.text())
+      setPendGps(p => ({ ...(p || {}), track: gpx.track, km: gpx.km, duracion: gpx.duracion }))
+      setKm(String(gpx.km))
+      if (gpx.fecha) cambiaFecha(gpx.fecha)
+      const fechaTxt = gpx.fecha
+        ? new Date(gpx.fecha + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+        : null
+      setMsgFoto(
+        `✓ Ruta del reloj: ${fechaTxt ? fechaTxt + ' · ' : ''}${gpx.km} km${gpx.duracion ? ' · ' + fmtDuracion(gpx.duracion) : ''}`
+      )
     } catch (err) {
       setMsgFoto('⚠ ' + err.message)
     }
@@ -171,6 +176,14 @@ export default function Registro({ editId, onDone, onCancel }) {
               <p className="gps-nota">
                 Registra km y ruta automáticamente. La pantalla se mantiene encendida
                 (con la pantalla apagada, Android pausa el GPS).
+              </p>
+              <label className="gpx-link">
+                ⌚ ¿La grabaste con el reloj? Importar GPX
+                <input type="file" accept=".gpx" onChange={importarGPX} style={{ display: 'none' }} />
+              </label>
+              <p className="gps-nota">
+                En Zepp: entrenamiento → ⋯ → Exportar datos → GPX. Rellena fecha, km,
+                duración y ruta de golpe.
               </p>
             </>
           ) : (
@@ -285,10 +298,12 @@ export default function Registro({ editId, onDone, onCancel }) {
           value={notes}
           onChange={e => setNotes(e.target.value)}
         />
-        <label className="gpx-link">
-          Importar ruta GPX (Wikiloc, Strava…)
-          <input type="file" accept=".gpx" onChange={importarGPX} style={{ display: 'none' }} />
-        </label>
+        {editId && (
+          <label className="gpx-link">
+            ⌚ Importar ruta GPX del reloj (Zepp, Wikiloc, Strava…)
+            <input type="file" accept=".gpx" onChange={importarGPX} style={{ display: 'none' }} />
+          </label>
+        )}
       </div>
 
       {msgFoto && <div className="aviso">{msgFoto}</div>}

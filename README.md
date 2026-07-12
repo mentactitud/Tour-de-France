@@ -25,6 +25,14 @@ importado del Excel original, con las fechas erróneas ya corregidas.
 3. La app queda en `https://<usuario>.github.io/Tour-de-France/`.
 4. Ábrela en el móvil con Chrome y elige **"Añadir a pantalla de inicio"**.
 
+## Conectar un reloj GPS (Zepp/Amazfit, Garmin, Wikiloc…)
+
+Graba la salida en el reloj como actividad (senderismo/caminata). Después, en la
+app del reloj, exporta esa actividad como **GPX** — en Zepp: entrenamiento →
+**⋯ → Exportar datos → GPX** — y en la jornada usa **«Importar GPX»**: la fecha,
+los km, la duración y la ruta se rellenan solos. Vale cualquier reloj o app que
+exporte GPX.
+
 ## Desarrollo
 
 ```bash

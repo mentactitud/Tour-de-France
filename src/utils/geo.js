@@ -97,13 +97,35 @@ export async function parseKMLoKMZ(file) {
   return parseKML(new TextDecoder().decode(buf))
 }
 
-// GPX (Wikiloc, Strava…) → [[lat,lng],…]
+// GPX del reloj o de Wikiloc/Strava → { track, km, fecha, duracion }
+// fecha/duracion salen de los <time> de los puntos (null si el GPX no trae horas)
 export function parseGPX(texto) {
   const doc = new DOMParser().parseFromString(texto, 'text/xml')
   if (doc.querySelector('parsererror')) throw new Error('GPX no válido')
-  const pts = [...doc.querySelectorAll('trkpt, rtept')]
-    .map(el => [parseFloat(el.getAttribute('lat')), parseFloat(el.getAttribute('lon'))])
-    .filter(c => Number.isFinite(c[0]) && Number.isFinite(c[1]))
-  if (pts.length < 2) throw new Error('El GPX no contiene ningún track')
-  return pts
+  const track = []
+  let primeraHora = null
+  let ultimaHora = null
+  for (const el of doc.querySelectorAll('trkpt, rtept')) {
+    const lat = parseFloat(el.getAttribute('lat'))
+    const lng = parseFloat(el.getAttribute('lon'))
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue
+    track.push([lat, lng])
+    const t = Date.parse(el.querySelector('time')?.textContent || '')
+    if (!Number.isNaN(t)) {
+      if (primeraHora === null) primeraHora = t
+      ultimaHora = t
+    }
+  }
+  if (track.length < 2) throw new Error('El GPX no contiene ningún track')
+  let fecha = null
+  if (primeraHora !== null) {
+    const d = new Date(primeraHora)
+    fecha = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+  return {
+    track,
+    km: Math.round(kmDeTrack(track) * 10) / 10,
+    fecha,
+    duracion: ultimaHora > primeraHora ? Math.round((ultimaHora - primeraHora) / 60000) : null
+  }
 }

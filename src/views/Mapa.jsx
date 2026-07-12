@@ -123,7 +123,7 @@ export default function Mapa() {
             <option value="">Ver ruta de jornada…</option>
             {conTrack.map(j => (
               <option key={j.id} value={j.id}>
-                {j.date} · {totalPiezas(j)} piezas{j.km ? ` · ${j.km} km` : ''}
+                {j.date} · {totalPiezas(j)} {totalPiezas(j) === 1 ? 'pieza' : 'piezas'}{j.km ? ` · ${j.km} km` : ''}
               </option>
             ))}
           </select>
