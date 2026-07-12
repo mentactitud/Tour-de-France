@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Tour-de-France/compartir/sw.js', { scope: '/Tour-de-France/compartir/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/hunting-tracker-app/compartir/sw.js', { scope: '/hunting-tracker-app/compartir/' })})}
