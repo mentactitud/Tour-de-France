@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { zipSync } from 'fflate'
 import { db, reimportHistorico, totalPiezas, cargarMapa } from '../db.js'
 import { ESPECIES, PERIODOS } from '../data/especies.js'
+import { leerExcel, descargarPlantilla } from '../utils/excel.js'
+import { COMPARTIR } from '../variante.js'
 import ImportarKML from '../components/ImportarKML.jsx'
 
 function descargar(nombre, contenido, tipo) {
@@ -75,6 +77,26 @@ export default function Ajustes() {
     setMsg(añadidas ? `✓ ${añadidas} jornadas del Excel recuperadas` : 'El histórico del Excel ya está completo')
   }
 
+  async function importarExcel(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      const { jornadas, avisos } = await leerExcel(file)
+      const fechas = `${jornadas[0].date} → ${jornadas[jornadas.length - 1].date}`
+      const piezasNuevas = jornadas.reduce((a, j) => a + totalPiezas(j), 0)
+      if (!confirm(
+        `El Excel contiene ${jornadas.length} jornadas (${fechas}) con ${piezasNuevas} piezas.` +
+        (avisos.length ? `\n\nAvisos:\n· ${avisos.slice(0, 5).join('\n· ')}` : '') +
+        `\n\n¿Añadirlas a las ${n} jornadas actuales?`
+      )) return
+      await db.jornadas.bulkAdd(jornadas)
+      setMsg(`✓ ${jornadas.length} jornadas importadas del Excel${avisos.length ? ` (${avisos.length} avisos)` : ''}`)
+    } catch (err) {
+      setMsg('⚠ ' + err.message)
+    }
+  }
+
   async function exportarFotosZip() {
     const fotos = await db.fotos.toArray()
     if (!fotos.length) { setMsg('No hay fotos guardadas todavía.'); return }
@@ -112,8 +134,29 @@ export default function Ajustes() {
           Importar copia JSON
           <input type="file" accept="application/json" onChange={importarJSON} style={{ display: 'none' }} />
         </label>
-        <button className="btn secundario" onClick={reimportar}>Recuperar histórico del Excel</button>
+        {!COMPARTIR && (
+          <button className="btn secundario" onClick={reimportar}>Recuperar histórico del Excel</button>
+        )}
         <button className="btn secundario" onClick={exportarFotosZip}>Exportar fotos (zip)</button>
+      </div>
+
+      <div className="card">
+        <h2>Importar desde Excel</h2>
+        <p style={{ fontSize: 13, color: 'var(--ink-2)', marginBottom: 10 }}>
+          Sube un .xlsx con una columna <b>Fecha</b> y una columna por especie
+          (Conejo, Zorzal…). Opcionales: Km, Notas y Periodo — si falta, el período
+          se deduce de la fecha. Descarga la plantilla para verlo.
+        </p>
+        <label className="btn secundario" style={{ textAlign: 'center', cursor: 'pointer' }}>
+          Importar Excel (.xlsx)
+          <input
+            type="file"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            onChange={importarExcel}
+            style={{ display: 'none' }}
+          />
+        </label>
+        <button className="btn secundario" onClick={descargarPlantilla}>Descargar plantilla Excel</button>
       </div>
 
       <div className="card">

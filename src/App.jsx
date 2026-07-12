@@ -4,6 +4,7 @@ import Historial from './views/Historial.jsx'
 import Estadisticas from './views/Estadisticas.jsx'
 import Mapa from './views/Mapa.jsx'
 import Ajustes from './views/Ajustes.jsx'
+import { TITULO, SUBTITULO } from './variante.js'
 
 const TABS = [
   { id: 'registro', label: 'Registro', ico: '✚' },
@@ -25,8 +26,8 @@ export default function App() {
   return (
     <>
       <header className="app-header">
-        <h1>Caza · Borges Blanques</h1>
-        <span className="sub">coto de caza</span>
+        <h1>{TITULO}</h1>
+        <span className="sub">{SUBTITULO}</span>
       </header>
       <main className="content">
         {tab === 'registro' && (

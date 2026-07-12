@@ -1,8 +1,9 @@
 // Sesión GPS de jornada: singleton persistido en localStorage para
 // sobrevivir a recargas de la app en el campo.
 import { haversineKm } from './utils/geo.js'
+import { COMPARTIR } from './variante.js'
 
-const KEY = 'caza.gps'
+const KEY = COMPARTIR ? 'caza.gps.compartir' : 'caza.gps'
 const MAX_ACCURACY_M = 35
 const MIN_DIST_KM = 0.005 // 5 m entre puntos
 

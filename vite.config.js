@@ -2,13 +2,18 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const compartir = process.env.VITE_VARIANTE === 'compartir'
+
 export default defineConfig({
-  base: '/Tour-de-France/',
+  base: compartir ? '/Tour-de-France/compartir/' : '/Tour-de-France/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        // la variante /compartir/ tiene su propio service worker: el SW
+        // principal no debe responder a sus navegaciones
+        navigateFallbackDenylist: [/\/compartir\//],
         // teselas del mapa en caché: las zonas ya vistas funcionan sin cobertura
         runtimeCaching: [
           {
@@ -23,8 +28,8 @@ export default defineConfig({
         ]
       },
       manifest: {
-        name: 'Caza — Borges Blanques',
-        short_name: 'Caza',
+        name: compartir ? 'Cuaderno de Caza' : 'Caza — Borges Blanques',
+        short_name: compartir ? 'Cuaderno' : 'Caza',
         description: 'Seguimiento y control de jornadas de caza',
         lang: 'es',
         theme_color: '#22402a',
