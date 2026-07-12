@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, reimportHistorico, totalPiezas } from '../db.js'
+import { zipSync } from 'fflate'
+import { db, reimportHistorico, totalPiezas, cargarMapa } from '../db.js'
 import { ESPECIES, PERIODOS } from '../data/especies.js'
+import ImportarKML from '../components/ImportarKML.jsx'
 
 function descargar(nombre, contenido, tipo) {
   const blob = new Blob([contenido], { type: tipo })
@@ -73,6 +75,23 @@ export default function Ajustes() {
     setMsg(añadidas ? `✓ ${añadidas} jornadas del Excel recuperadas` : 'El histórico del Excel ya está completo')
   }
 
+  async function exportarFotosZip() {
+    const fotos = await db.fotos.toArray()
+    if (!fotos.length) { setMsg('No hay fotos guardadas todavía.'); return }
+    const jornadas = new Map((await db.jornadas.toArray()).map(j => [j.id, j.date]))
+    const entradas = {}
+    const contador = {}
+    for (const f of fotos) {
+      const fecha = jornadas.get(f.jornadaId) || 'sin-fecha'
+      contador[fecha] = (contador[fecha] || 0) + 1
+      entradas[`${fecha}/caza-${fecha}-${contador[fecha]}.jpg`] =
+        new Uint8Array(await f.blob.arrayBuffer())
+    }
+    const zip = zipSync(entradas, { level: 0 }) // JPEG ya comprimido
+    descargar(`fotos-caza-${new Date().toISOString().slice(0, 10)}.zip`, zip, 'application/zip')
+    setMsg(`✓ ${fotos.length} fotos exportadas en zip`)
+  }
+
   async function borrarTodo() {
     if (!confirm(`¿Borrar TODAS las jornadas (${n})? Esta acción no se puede deshacer.`)) return
     if (!confirm('¿Seguro? Se perderá todo lo registrado en este dispositivo.')) return
@@ -94,12 +113,23 @@ export default function Ajustes() {
           <input type="file" accept="application/json" onChange={importarJSON} style={{ display: 'none' }} />
         </label>
         <button className="btn secundario" onClick={reimportar}>Recuperar histórico del Excel</button>
+        <button className="btn secundario" onClick={exportarFotosZip}>Exportar fotos (zip)</button>
+      </div>
+
+      <div className="card">
+        <h2>Mapa del coto</h2>
+        <EstadoMapa />
+        <ImportarKML />
+        <p style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 8 }}>
+          Exporta el archivo desde Google My Maps: menú ⋮ → «Exportar a KML/KMZ»,
+          desmarcando «Mantener actualizados los datos con el mapa».
+        </p>
       </div>
 
       <div className="aviso">
         <b>Copia de seguridad:</b> los datos viven en este dispositivo (funciona sin cobertura).
-        Exporta el JSON de vez en cuando y guárdalo en tu Drive. La sincronización automática
-        con Google Drive y las fotos de jornada llegan en la Fase 2.
+        Exporta el JSON de vez en cuando y guárdalo en tu Drive (las fotos van aparte,
+        con «Exportar fotos (zip)» o compartiéndolas desde cada jornada).
       </div>
 
       <div className="card">
@@ -109,5 +139,15 @@ export default function Ajustes() {
 
       {msg && <div className="aviso">{msg}</div>}
     </div>
+  )
+}
+
+function EstadoMapa() {
+  const mapa = useLiveQuery(() => cargarMapa(), [])
+  if (!mapa) return <p style={{ fontSize: 14, color: 'var(--ink-2)', marginBottom: 10 }}>Sin mapa cargado.</p>
+  return (
+    <p style={{ fontSize: 14, color: 'var(--ink-2)', marginBottom: 10 }}>
+      «{mapa.name}»: {mapa.polygons.length} zona(s), {mapa.lines.length} línea(s), {mapa.points.length} favorito(s).
+    </p>
   )
 }

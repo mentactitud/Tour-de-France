@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { PERIODOS, periodoPorFecha, temporadaPara } from '../data/especies.js'
+import { gps } from '../gps.js'
+import { parseGPX, kmDeTrack } from '../utils/geo.js'
+import { comprimirFoto, guardarFotos, compartirFotos } from '../utils/fotos.js'
 
 function hoy() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function fmtDuracion(min) {
+  return min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} min`
 }
 
 export default function Registro({ editId, onDone, onCancel }) {
@@ -15,11 +23,38 @@ export default function Registro({ editId, onDone, onCancel }) {
   const [km, setKm] = useState('')
   const [notes, setNotes] = useState('')
   const [guardado, setGuardado] = useState(false)
+  const [sesion, setSesion] = useState(gps.activa())
+  const [pendGps, setPendGps] = useState(null) // {km,duracion,track,lances} al terminar
+  const [fotosNuevas, setFotosNuevas] = useState([]) // [{blob,url}]
+  const [msgFoto, setMsgFoto] = useState('')
+  const [, setTic] = useState(0)
+  const jornadaRef = useRef(null)
+
+  const fotosGuardadas = useLiveQuery(
+    () => (editId ? db.fotos.where('jornadaId').equals(editId).toArray() : []),
+    [editId]
+  )
+  const urlsGuardadas = useMemo(
+    () => (fotosGuardadas || []).map(f => ({ ...f, url: URL.createObjectURL(f.blob) })),
+    [fotosGuardadas]
+  )
+  useEffect(() => () => urlsGuardadas.forEach(f => URL.revokeObjectURL(f.url)), [urlsGuardadas])
+  useEffect(() => () => fotosNuevas.forEach(f => URL.revokeObjectURL(f.url)), [fotosNuevas])
+
+  useEffect(() => gps.subscribe(setSesion), [])
+
+  // cronómetro en vivo mientras hay sesión GPS
+  useEffect(() => {
+    if (!sesion) return
+    const t = setInterval(() => setTic(x => x + 1), 5000)
+    return () => clearInterval(t)
+  }, [sesion])
 
   useEffect(() => {
     if (!editId) return
     db.jornadas.get(editId).then(j => {
       if (!j) return
+      jornadaRef.current = j
       setDate(j.date)
       setPeriod(j.period)
       setPeriodManual(true)
@@ -35,6 +70,8 @@ export default function Registro({ editId, onDone, onCancel }) {
   }
 
   function suma(sp, delta) {
+    if (delta > 0) gps.lance(sp)
+    else gps.quitarLance(sp)
     setCounts(c => {
       const n = Math.max(0, (c[sp] || 0) + delta)
       const next = { ...c }
@@ -44,8 +81,58 @@ export default function Registro({ editId, onDone, onCancel }) {
     })
   }
 
+  function terminarGps() {
+    const res = gps.terminar()
+    if (!res) return
+    setPendGps(res)
+    if (res.km > 0) setKm(String(res.km))
+  }
+
+  async function importarGPX(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const track = parseGPX(await file.text())
+      const kmGpx = Math.round(kmDeTrack(track) * 10) / 10
+      setPendGps(p => ({ ...(p || {}), track, km: kmGpx }))
+      setKm(String(kmGpx))
+      setMsgFoto(`✓ GPX importado: ${kmGpx} km`)
+    } catch (err) {
+      setMsgFoto('⚠ ' + err.message)
+    }
+    e.target.value = ''
+  }
+
+  async function anadirFotos(e) {
+    const files = [...(e.target.files || [])]
+    e.target.value = ''
+    if (!files.length) return
+    try {
+      const nuevas = []
+      for (const f of files) {
+        const blob = await comprimirFoto(f)
+        nuevas.push({ blob, url: URL.createObjectURL(blob) })
+      }
+      setFotosNuevas(prev => [...prev, ...nuevas])
+    } catch (err) {
+      setMsgFoto('⚠ ' + err.message)
+    }
+  }
+
+  async function borrarFotoGuardada(id) {
+    if (confirm('¿Borrar esta foto?')) await db.fotos.delete(id)
+  }
+
+  async function compartir() {
+    const todas = [...(fotosGuardadas || []), ...fotosNuevas.map(f => ({ blob: f.blob }))]
+    if (!todas.length) return
+    const ok = await compartirFotos(todas, date)
+    if (!ok) setMsgFoto('Tu navegador no permite compartir: se han descargado las fotos.')
+  }
+
   async function guardar() {
     if (!date) return
+    const prev = jornadaRef.current
     const jornada = {
       date,
       period,
@@ -53,22 +140,70 @@ export default function Registro({ editId, onDone, onCancel }) {
       counts,
       km: km === '' ? null : parseFloat(km),
       notes: notes.trim(),
-      source: 'app'
+      duracion: pendGps?.duracion ?? prev?.duracion ?? null,
+      track: pendGps?.track ?? prev?.track ?? null,
+      lances: pendGps?.lances ?? prev?.lances ?? null,
+      source: prev?.source || 'app'
     }
+    let id = editId
     if (editId) {
       await db.jornadas.update(editId, jornada)
     } else {
-      await db.jornadas.add(jornada)
+      id = await db.jornadas.add(jornada)
     }
+    if (fotosNuevas.length) await guardarFotos(id, fotosNuevas.map(f => f.blob))
     setGuardado(true)
     setTimeout(() => onDone(), 350)
   }
 
   const especies = PERIODOS[period].especies
   const totalDia = Object.values(counts).reduce((a, b) => a + b, 0)
+  const minutos = sesion ? Math.round((Date.now() - sesion.startTs) / 60000) : 0
+  const nFotos = (fotosGuardadas?.length || 0) + fotosNuevas.length
 
   return (
     <div>
+      {!editId && (
+        <div className={'card gps-card' + (sesion ? ' activa' : '')}>
+          {!sesion ? (
+            <>
+              <button className="btn" onClick={() => gps.iniciar()}>▶ Iniciar jornada con GPS</button>
+              <p className="gps-nota">
+                Registra km y ruta automáticamente. La pantalla se mantiene encendida
+                (con la pantalla apagada, Android pausa el GPS).
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="gps-live">
+                <span className="gps-punto" aria-hidden="true" />
+                <b>Jornada en curso</b>
+                <span>{fmtDuracion(minutos)}</span>
+                <span>{(Math.round(sesion.km * 10) / 10).toFixed(1)} km</span>
+              </div>
+              <p className="gps-nota">
+                Cada <b>+1</b> guarda también el punto del lance. Al terminar se
+                rellenan los km y la duración.
+              </p>
+              <button className="btn" onClick={terminarGps}>◼ Terminar jornada</button>
+              <button
+                className="btn secundario"
+                onClick={() => { if (confirm('¿Descartar el GPS de esta jornada?')) gps.descartar() }}
+              >
+                Descartar GPS
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {pendGps && (
+        <div className="aviso">
+          ✓ GPS registrado: {pendGps.km ?? '?'} km
+          {pendGps.duracion ? ` en ${fmtDuracion(pendGps.duracion)}` : ''} — se guardará con la jornada.
+        </div>
+      )}
+
       <div className="card">
         <h2>{editId ? 'Editar jornada' : 'Nueva jornada'}</h2>
         <div className="form-row">
@@ -114,13 +249,49 @@ export default function Registro({ editId, onDone, onCancel }) {
       </div>
 
       <div className="card">
+        <h2>Fotos {nFotos > 0 ? `(${nFotos})` : ''}</h2>
+        <div className="fotos-grid">
+          {urlsGuardadas.map(f => (
+            <div key={f.id} className="foto-mini">
+              <img src={f.url} alt="Foto de la jornada" loading="lazy" />
+              <button aria-label="Borrar foto" onClick={() => borrarFotoGuardada(f.id)}>✕</button>
+            </div>
+          ))}
+          {fotosNuevas.map((f, i) => (
+            <div key={f.url} className="foto-mini">
+              <img src={f.url} alt="Foto nueva" />
+              <button
+                aria-label="Quitar foto"
+                onClick={() => setFotosNuevas(arr => arr.filter((_, x) => x !== i))}
+              >✕</button>
+            </div>
+          ))}
+          <label className="foto-add">
+            📷
+            <input type="file" accept="image/*" capture="environment" multiple onChange={anadirFotos} style={{ display: 'none' }} />
+          </label>
+        </div>
+        {nFotos > 0 && (
+          <button className="btn secundario" onClick={compartir}>
+            Compartir fotos (Drive, WhatsApp…)
+          </button>
+        )}
+      </div>
+
+      <div className="card">
         <h2>Notas</h2>
         <textarea
           placeholder="Meteo, zona, compañeros, perros…"
           value={notes}
           onChange={e => setNotes(e.target.value)}
         />
+        <label className="gpx-link">
+          Importar ruta GPX (Wikiloc, Strava…)
+          <input type="file" accept=".gpx" onChange={importarGPX} style={{ display: 'none' }} />
+        </label>
       </div>
+
+      {msgFoto && <div className="aviso">{msgFoto}</div>}
 
       <button className="btn" onClick={guardar} disabled={guardado}>
         {guardado ? '✓ Guardada' : editId ? 'Guardar cambios' : 'Guardar jornada'}

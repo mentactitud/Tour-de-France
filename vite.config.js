@@ -8,6 +8,20 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // teselas del mapa en caché: las zonas ya vistas funcionan sin cobertura
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/(www\.ign\.es|tile\.openstreetmap\.org)\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'teselas-mapa',
+              expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 24 * 3600 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          }
+        ]
+      },
       manifest: {
         name: 'Caza — Borges Blanques',
         short_name: 'Caza',

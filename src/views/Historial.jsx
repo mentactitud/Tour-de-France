@@ -13,6 +13,11 @@ function fmtFecha(dateStr) {
 
 export default function Historial({ onEdit }) {
   const jornadas = useLiveQuery(() => db.jornadas.orderBy('date').reverse().toArray(), [])
+  const nFotos = useLiveQuery(async () => {
+    const m = {}
+    await db.fotos.each(f => { m[f.jornadaId] = (m[f.jornadaId] || 0) + 1 })
+    return m
+  }, [])
   const [fAno, setFAno] = useState('')
   const [fMes, setFMes] = useState('')
   const [fDia, setFDia] = useState('')
@@ -112,6 +117,7 @@ export default function Historial({ onEdit }) {
                 <span className="detalle">
                   {Object.entries(j.counts || {}).map(([sp, n]) => `${n} ${sp}`).join(' · ') || 'sin piezas'}
                   {j.km ? ` · ${j.km} km` : ''}
+                  {nFotos?.[j.id] ? ` · 📷 ${nFotos[j.id]}` : ''}
                   {j.notes ? ` · ${j.notes}` : ''}
                 </span>
                 <span className="total">{totalPiezas(j)}</span>

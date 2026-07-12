@@ -2,12 +2,14 @@ import { useState } from 'react'
 import Registro from './views/Registro.jsx'
 import Historial from './views/Historial.jsx'
 import Estadisticas from './views/Estadisticas.jsx'
+import Mapa from './views/Mapa.jsx'
 import Ajustes from './views/Ajustes.jsx'
 
 const TABS = [
   { id: 'registro', label: 'Registro', ico: '✚' },
   { id: 'historial', label: 'Historial', ico: '☰' },
   { id: 'stats', label: 'Estadísticas', ico: '▦' },
+  { id: 'mapa', label: 'Mapa', ico: '⌖' },
   { id: 'ajustes', label: 'Ajustes', ico: '⚙' }
 ]
 
@@ -36,6 +38,7 @@ export default function App() {
         )}
         {tab === 'historial' && <Historial onEdit={editar} />}
         {tab === 'stats' && <Estadisticas />}
+        {tab === 'mapa' && <Mapa />}
         {tab === 'ajustes' && <Ajustes />}
       </main>
       <nav className="tabbar">
