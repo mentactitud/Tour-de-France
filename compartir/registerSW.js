@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Tour-de-France/compartir/sw.js', { scope: '/Tour-de-France/compartir/' })})}
