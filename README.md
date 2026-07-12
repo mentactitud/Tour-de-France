@@ -22,8 +22,8 @@ importado del Excel original, con las fechas erróneas ya corregidas.
 
 1. En GitHub: **Settings → Pages → Source: GitHub Actions**.
 2. Haz push a `main` (o lanza el workflow "Desplegar en GitHub Pages" a mano).
-3. La app queda en `https://<usuario>.github.io/hunting-tracker-app/` (y la
-   versión para compartir, sin datos, en `…/hunting-tracker-app/compartir/`).
+3. La app queda en `https://<usuario>.github.io/<nombre-del-repo>/` (y la
+   versión para compartir, sin datos, en `…/<nombre-del-repo>/compartir/`).
 4. Ábrela en el móvil con Chrome y elige **"Añadir a pantalla de inicio"**.
 
 ## Conectar un reloj GPS (Zepp/Amazfit, Garmin, Wikiloc…)

@@ -5,7 +5,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 const compartir = process.env.VITE_VARIANTE === 'compartir'
 
 export default defineConfig({
-  base: compartir ? '/hunting-tracker-app/compartir/' : '/hunting-tracker-app/',
+  // OJO: debe coincidir con el nombre del repositorio en GitHub.
+  // Si el repo se renombra a hunting-tracker-app, cambiar aquí las dos rutas.
+  base: compartir ? '/Tour-de-France/compartir/' : '/Tour-de-France/',
   plugins: [
     react(),
     VitePWA({
