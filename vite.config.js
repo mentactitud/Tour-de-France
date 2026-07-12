@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 const compartir = process.env.VITE_VARIANTE === 'compartir'
 
 export default defineConfig({
-  base: compartir ? '/Tour-de-France/compartir/' : '/Tour-de-France/',
+  base: compartir ? '/hunting-tracker-app/compartir/' : '/hunting-tracker-app/',
   plugins: [
     react(),
     VitePWA({
