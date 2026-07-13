@@ -117,6 +117,7 @@ export default function Historial({ onEdit }) {
                 <span className="detalle">
                   {Object.entries(j.counts || {}).map(([sp, n]) => `${n} ${sp}`).join(' · ') || 'sin piezas'}
                   {j.km ? ` · ${j.km} km` : ''}
+                  {j.cartuchos ? ` · ${j.cartuchos} cart.` : ''}
                   {nFotos?.[j.id] ? ` · 📷 ${nFotos[j.id]}` : ''}
                   {j.notes ? ` · ${j.notes}` : ''}
                 </span>

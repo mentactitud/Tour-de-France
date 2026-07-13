@@ -47,6 +47,7 @@ export async function leerExcel(file) {
     const col = {
       fecha: cab.indexOf('fecha'),
       km: cab.findIndex(c => c === 'km' || c.startsWith('km ')),
+      cartuchos: cab.findIndex(c => c === 'cartuchos' || c.startsWith('cartucho')),
       notas: cab.indexOf('notas'),
       periodo: cab.findIndex(c => c === 'periodo'),
       especies: []
@@ -78,12 +79,14 @@ export async function leerExcel(file) {
         (col.periodo >= 0 && PERIODO_POR_NOMBRE.get(norm(fila[col.periodo]))) ||
         periodoPorFecha(date)
       const kmV = col.km >= 0 ? parseFloat(fila[col.km]) : NaN
+      const cartV = col.cartuchos >= 0 ? parseInt(parseFloat(fila[col.cartuchos]), 10) : NaN
       jornadas.push({
         date,
         period,
         season: temporadaPara(date, period),
         counts,
         km: Number.isFinite(kmV) ? kmV : null,
+        cartuchos: Number.isFinite(cartV) ? cartV : null,
         notes: col.notas >= 0 ? String(fila[col.notas] ?? '').trim() : '',
         source: 'excel-import'
       })
@@ -97,11 +100,11 @@ export async function leerExcel(file) {
 export async function descargarPlantilla() {
   const XLSX = await import('xlsx')
   const hoja = XLSX.utils.aoa_to_sheet([
-    ['Fecha', ...ESPECIES, 'Km', 'Notas', 'Periodo'],
-    ['12/10/2025', 2, '', 1, '', '', '', '', '', '', '', '', '', 7.5, 'Mañana de niebla', 'Veda General'],
-    ['21/08/2025', '', '', 5, '', '', '', '', '', '', '', '', '', '', '', 'Media Veda']
+    ['Fecha', ...ESPECIES, 'Km', 'Cartuchos', 'Notas', 'Periodo'],
+    ['12/10/2025', 2, '', 1, '', '', '', '', '', '', '', '', '', 7.5, 8, 'Mañana de niebla', 'Veda General'],
+    ['21/08/2025', '', '', 5, '', '', '', '', '', '', '', '', '', '', 12, '', 'Media Veda']
   ])
-  hoja['!cols'] = [{ wch: 12 }, ...ESPECIES.map(() => ({ wch: 9 })), { wch: 6 }, { wch: 24 }, { wch: 13 }]
+  hoja['!cols'] = [{ wch: 12 }, ...ESPECIES.map(() => ({ wch: 9 })), { wch: 6 }, { wch: 10 }, { wch: 24 }, { wch: 13 }]
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, hoja, 'Jornadas')
   XLSX.writeFile(wb, 'plantilla-cuaderno-caza.xlsx')

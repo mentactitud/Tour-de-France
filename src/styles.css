@@ -337,6 +337,21 @@ textarea { resize: vertical; min-height: 60px; }
 }
 @media (prefers-color-scheme: dark) { .gpx-link { color: #7fb08f; } }
 
+/* ---- Cartuchos / puntería ---- */
+.punteria {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+}
+.punteria .valor {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.punteria .etq { font-size: 12px; color: var(--muted); }
+
 /* ---- Fotos ---- */
 .fotos-grid {
   display: grid;

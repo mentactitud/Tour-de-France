@@ -35,7 +35,7 @@ export default function Ajustes() {
 
   async function exportarCSV() {
     const todas = await db.jornadas.orderBy('date').toArray()
-    const cab = ['fecha', 'periodo', 'temporada', ...ESPECIES, 'total', 'km', 'notas']
+    const cab = ['fecha', 'periodo', 'temporada', ...ESPECIES, 'total', 'km', 'cartuchos', 'notas']
     const filas = todas.map(j => [
       j.date,
       PERIODOS[j.period].label,
@@ -43,6 +43,7 @@ export default function Ajustes() {
       ...ESPECIES.map(sp => j.counts?.[sp] ?? ''),
       totalPiezas(j),
       j.km ?? '',
+      j.cartuchos ?? '',
       `"${(j.notes || '').replaceAll('"', '""')}"`
     ].join(';'))
     descargar(
@@ -144,8 +145,8 @@ export default function Ajustes() {
         <h2>Importar desde Excel</h2>
         <p style={{ fontSize: 13, color: 'var(--ink-2)', marginBottom: 10 }}>
           Sube un .xlsx con una columna <b>Fecha</b> y una columna por especie
-          (Conejo, Zorzal…). Opcionales: Km, Notas y Periodo — si falta, el período
-          se deduce de la fecha. Descarga la plantilla para verlo.
+          (Conejo, Zorzal…). Opcionales: Km, Cartuchos, Notas y Periodo — si falta,
+          el período se deduce de la fecha. Descarga la plantilla para verlo.
         </p>
         <label className="btn secundario" style={{ textAlign: 'center', cursor: 'pointer' }}>
           Importar Excel (.xlsx)

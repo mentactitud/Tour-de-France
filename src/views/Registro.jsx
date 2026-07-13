@@ -21,6 +21,7 @@ export default function Registro({ editId, onDone, onCancel }) {
   const [periodManual, setPeriodManual] = useState(false)
   const [counts, setCounts] = useState({})
   const [km, setKm] = useState('')
+  const [cartuchos, setCartuchos] = useState('')
   const [notes, setNotes] = useState('')
   const [guardado, setGuardado] = useState(false)
   const [sesion, setSesion] = useState(gps.activa())
@@ -60,6 +61,7 @@ export default function Registro({ editId, onDone, onCancel }) {
       setPeriodManual(true)
       setCounts(j.counts || {})
       setKm(j.km ?? '')
+      setCartuchos(j.cartuchos ?? '')
       setNotes(j.notes || '')
     })
   }, [editId])
@@ -144,6 +146,7 @@ export default function Registro({ editId, onDone, onCancel }) {
       season: temporadaPara(date, period),
       counts,
       km: km === '' ? null : parseFloat(km),
+      cartuchos: cartuchos === '' ? null : parseInt(cartuchos, 10),
       notes: notes.trim(),
       duracion: pendGps?.duracion ?? prev?.duracion ?? null,
       track: pendGps?.track ?? prev?.track ?? null,
@@ -163,6 +166,7 @@ export default function Registro({ editId, onDone, onCancel }) {
 
   const especies = PERIODOS[period].especies
   const totalDia = Object.values(counts).reduce((a, b) => a + b, 0)
+  const nCart = cartuchos === '' ? null : parseInt(cartuchos, 10)
   const minutos = sesion ? Math.round((Date.now() - sesion.startTs) / 60000) : 0
   const nFotos = (fotosGuardadas?.length || 0) + fotosNuevas.length
 
@@ -258,6 +262,28 @@ export default function Registro({ editId, onDone, onCancel }) {
               <button className="mas" aria-label={`Añadir ${sp}`} onClick={() => suma(sp, 1)}>+</button>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Cartuchos gastados</h2>
+        <div className="form-row" style={{ alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ maxWidth: 140 }}>
+            Nº de cartuchos
+            <input
+              type="number" inputMode="numeric" min="0" step="1"
+              placeholder="—" value={cartuchos} onChange={e => setCartuchos(e.target.value)}
+            />
+          </label>
+          {nCart > 0 && totalDia > 0 && (
+            <div className="punteria">
+              <span className="valor">{(nCart / totalDia).toFixed(1)}</span>
+              <span className="etq">cartuchos por pieza</span>
+            </div>
+          )}
+          {nCart > 0 && totalDia === 0 && (
+            <div className="punteria"><span className="etq">sin piezas todavía</span></div>
+          )}
         </div>
       </div>
 

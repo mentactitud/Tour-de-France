@@ -65,6 +65,9 @@ export default function Estadisticas() {
 
   const kmTotal = jActual.reduce((a, j) => a + (j.km || 0), 0)
   const mejorJornada = Math.max(0, ...jActual.map(cuenta))
+  const cartTotal = jActual.reduce((a, j) => a + (j.cartuchos || 0), 0)
+  // puntería sobre el total de piezas de la temporada (no filtrado por especie)
+  const piezasTemporada = jActual.reduce((a, j) => a + totalPiezas(j), 0)
 
   // ---- Series de acumulado por temporada ----
   const series = seasons.map(s => {
@@ -109,6 +112,16 @@ export default function Estadisticas() {
           ? <StatTile label={`Km andados ${actual}`} value={kmTotal.toFixed(1)} />
           : <StatTile label="Mejor jornada" value={mejorJornada} />}
       </div>
+
+      {cartTotal > 0 && (
+        <div className="kpi-row">
+          <StatTile label={`Cartuchos ${actual}`} value={cartTotal} />
+          <StatTile
+            label="Cartuchos / pieza"
+            value={piezasTemporada ? (cartTotal / piezasTemporada).toFixed(1) : '—'}
+          />
+        </div>
+      )}
 
       <div className="card">
         <h2>Acumulado de temporada{espSel !== 'Todas' ? ` · ${espSel}` : ''}</h2>

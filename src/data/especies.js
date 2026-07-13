@@ -34,13 +34,16 @@ export function periodoPorFecha(dateStr) {
   return 'veda_general'
 }
 
-// Etiqueta de temporada: descaste/media veda → año; veda general → "2025-26"
+// Etiqueta de temporada: descaste/media veda → año; veda general → "2026-27".
+// La Veda General de un año arranca en otoño: cualquier fecha de marzo en
+// adelante pertenece a la temporada que empieza ese año; enero y febrero son
+// la cola de la temporada que empezó el año anterior.
 export function temporadaPara(dateStr, period) {
   const d = new Date(dateStr + 'T12:00:00')
   const y = d.getFullYear()
   const m = d.getMonth() + 1
   if (period !== 'veda_general') return String(y)
-  if (m >= 8) return `${y}-${String((y + 1) % 100).padStart(2, '0')}`
+  if (m >= 3) return `${y}-${String((y + 1) % 100).padStart(2, '0')}`
   return `${y - 1}-${String(y % 100).padStart(2, '0')}`
 }
 
