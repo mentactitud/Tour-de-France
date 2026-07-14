@@ -5,6 +5,21 @@ import { PERIODOS, periodoPorFecha, temporadaPara } from '../data/especies.js'
 import { gps } from '../gps.js'
 import { parseGPX } from '../utils/geo.js'
 import { comprimirFoto, guardarFotos, compartirFotos } from '../utils/fotos.js'
+import { centroDelMapa, meteoDeFecha } from '../utils/meteo.js'
+import { compartirResumen } from '../utils/resumen.js'
+import { cargarMapa } from '../db.js'
+import Prevision from '../components/Prevision.jsx'
+
+// Tras guardar, intenta anotar la meteo del día en la jornada (sin bloquear)
+async function anotarMeteo(id, fecha) {
+  try {
+    const mapa = await cargarMapa()
+    const coords = centroDelMapa(mapa)
+    if (!coords) return
+    const meteo = await meteoDeFecha(coords, fecha)
+    await db.jornadas.update(id, { meteo })
+  } catch { /* sin red o sin datos: la jornada queda sin meteo */ }
+}
 
 function hoy() {
   const d = new Date()
@@ -137,6 +152,14 @@ export default function Registro({ editId, onDone, onCancel }) {
     if (!ok) setMsgFoto('Tu navegador no permite compartir: se han descargado las fotos.')
   }
 
+  async function compartirJornada() {
+    const j = jornadaRef.current
+    if (!j) return
+    const fotos = fotosGuardadas || []
+    const mapa = await cargarMapa()
+    await compartirResumen({ ...j, counts, km: km === '' ? null : parseFloat(km), cartuchos: cartuchos === '' ? null : parseInt(cartuchos, 10), notes }, fotos, mapa?.name || '')
+  }
+
   async function guardar() {
     if (!date) return
     const prev = jornadaRef.current
@@ -160,6 +183,8 @@ export default function Registro({ editId, onDone, onCancel }) {
       id = await db.jornadas.add(jornada)
     }
     if (fotosNuevas.length) await guardarFotos(id, fotosNuevas.map(f => f.blob))
+    // meteo del día en segundo plano (si se editó la fecha, se reanota)
+    if (!jornadaRef.current?.meteo || jornadaRef.current.date !== date) anotarMeteo(id, date)
     setGuardado(true)
     setTimeout(() => onDone(), 350)
   }
@@ -172,6 +197,7 @@ export default function Registro({ editId, onDone, onCancel }) {
 
   return (
     <div>
+      {!editId && <Prevision />}
       {!editId && (
         <div className={'card gps-card' + (sesion ? ' activa' : '')}>
           {!sesion ? (
@@ -338,9 +364,14 @@ export default function Registro({ editId, onDone, onCancel }) {
         {guardado ? '✓ Guardada' : editId ? 'Guardar cambios' : 'Guardar jornada'}
       </button>
       {editId && (
-        <button className="btn secundario" onClick={() => { onCancel(); onDone() }}>
-          Cancelar
-        </button>
+        <>
+          <button className="btn secundario" onClick={compartirJornada}>
+            📤 Compartir resumen (WhatsApp…)
+          </button>
+          <button className="btn secundario" onClick={() => { onCancel(); onDone() }}>
+            Cancelar
+          </button>
+        </>
       )}
     </div>
   )

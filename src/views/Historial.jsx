@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, totalPiezas } from '../db.js'
+import { db, totalPiezas, cargarMapa } from '../db.js'
 import { PERIODOS } from '../data/especies.js'
+import { tiempoDe } from '../utils/meteo.js'
+import { compartirResumen } from '../utils/resumen.js'
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
@@ -47,6 +49,15 @@ export default function Historial({ onEdit }) {
 
   function cambiaAno(v) { setFAno(v); setFMes(''); setFDia('') }
   function cambiaMes(v) { setFMes(v); setFDia('') }
+
+  async function compartir(e, j) {
+    e.stopPropagation()
+    const [fotos, mapa] = await Promise.all([
+      db.fotos.where('jornadaId').equals(j.id).toArray(),
+      cargarMapa()
+    ])
+    await compartirResumen(j, fotos, mapa?.name || '')
+  }
 
   async function borrar(e, j) {
     e.stopPropagation()
@@ -118,10 +129,17 @@ export default function Historial({ onEdit }) {
                   {Object.entries(j.counts || {}).map(([sp, n]) => `${n} ${sp}`).join(' · ') || 'sin piezas'}
                   {j.km ? ` · ${j.km} km` : ''}
                   {j.cartuchos ? ` · ${j.cartuchos} cart.` : ''}
+                  {j.meteo ? ` · ${tiempoDe(j.meteo.code).emoji} ${j.meteo.tmax}°` : ''}
                   {nFotos?.[j.id] ? ` · 📷 ${nFotos[j.id]}` : ''}
                   {j.notes ? ` · ${j.notes}` : ''}
                 </span>
                 <span className="total">{totalPiezas(j)}</span>
+                <button
+                  className="chip"
+                  aria-label="Compartir jornada"
+                  style={{ padding: '4px 9px' }}
+                  onClick={e => compartir(e, j)}
+                >📤</button>
                 <button
                   className="chip"
                   aria-label="Borrar jornada"
