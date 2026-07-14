@@ -279,8 +279,12 @@ function EditorVedas() {
         </div>
       ))}
       <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0 10px' }}>
-        Orientativas: ajústalas cada año a la resolución de vedas de tu comunidad.
-        Se usan para la cuenta atrás de la pantalla de Registro.
+        Cargadas según la Resolución de vedas 2026-27 de Cataluña: Veda General
+        11/10–07/02 (zorzal hasta el 14/02, perdiz hasta el 03/01), Media Veda solo
+        los días 23 y 30 de agosto y 6 y 13 de septiembre, y conejo todo el año en
+        Les Garrigues (del 1 abr al 14 ago, sin perro). Ajústalas cada temporada
+        con la nueva resolución; un período con apertura 01/03 y cierre 28/02
+        cuenta como todo el año.
       </p>
       <button className="btn secundario" onClick={guardar}>Guardar fechas de veda</button>
       {msg && <div className="aviso" style={{ marginTop: 10 }}>{msg}</div>}

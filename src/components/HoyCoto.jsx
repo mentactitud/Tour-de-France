@@ -43,7 +43,10 @@ export default function HoyCoto() {
       <div className="hc-vedas">
         {abiertos.map(a => (
           <span key={a.period} className="hc-veda abierta">
-            🔓 {PERIODOS[a.period].label} · cierra el {fmtDia(a.fecha)} ({a.dias} {a.dias === 1 ? 'día' : 'días'})
+            🔓 {PERIODOS[a.period].label}
+            {a.todoElAno
+              ? ' · todo el año'
+              : ` · cierra el ${fmtDia(a.fecha)} (${a.dias} ${a.dias === 1 ? 'día' : 'días'})`}
           </span>
         ))}
         {abiertos.length === 0 && proximos[0] && (
