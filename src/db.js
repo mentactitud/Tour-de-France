@@ -67,3 +67,12 @@ export async function guardarMapa(mapa) {
 export function cargarMapa() {
   return db.mapa.get('coto')
 }
+
+// La tabla mapa hace también de almacén de configuración (registros con id fijo)
+export async function guardarVedas(fechas) {
+  await db.mapa.put({ id: 'vedas', fechas })
+}
+
+export async function cargarVedas() {
+  return (await db.mapa.get('vedas'))?.fechas || null
+}

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { zipSync } from 'fflate'
-import { db, reimportHistorico, totalPiezas, cargarMapa } from '../db.js'
+import { db, reimportHistorico, totalPiezas, cargarMapa, cargarVedas, guardarVedas } from '../db.js'
 import { ESPECIES, PERIODOS } from '../data/especies.js'
+import { VEDAS_DEFECTO } from '../data/vedas.js'
 import { leerExcel, descargarPlantilla } from '../utils/excel.js'
 import { COMPARTIR } from '../variante.js'
 import ImportarKML from '../components/ImportarKML.jsx'
@@ -213,12 +214,76 @@ export default function Ajustes() {
         con «Exportar fotos (zip)» o compartiéndolas desde cada jornada).
       </div>
 
+      <EditorVedas />
+
       <div className="card">
         <h2>Zona de peligro</h2>
         <button className="btn peligro" onClick={borrarTodo}>Borrar todos los datos</button>
       </div>
 
       {msg && <div className="aviso">{msg}</div>}
+    </div>
+  )
+}
+
+function EditorVedas() {
+  const guardadas = useLiveQuery(async () => (await cargarVedas()) ?? VEDAS_DEFECTO, [])
+  const [form, setForm] = useState(null)
+  const [msg, setMsg] = useState('')
+  const vedas = form ?? guardadas
+
+  if (!vedas) return null
+  const aTexto = ddmm => String(ddmm).replace('-', '/') // DD-MM → DD/MM
+  const valida = t => /^([0-2]?\d|3[01])\/(0?\d|1[0-2])$/.test(t.trim())
+
+  function cambia(period, campo, valor) {
+    setForm({ ...vedas, [period]: { ...vedas[period], [campo]: valor } })
+    setMsg('')
+  }
+
+  async function guardar() {
+    const limpio = {}
+    for (const [p, v] of Object.entries(vedas)) {
+      const ini = String(v.ini).includes('/') ? v.ini : aTexto(v.ini)
+      const fin = String(v.fin).includes('/') ? v.fin : aTexto(v.fin)
+      if (!valida(ini) || !valida(fin)) {
+        setMsg(`⚠ Fecha no válida en ${PERIODOS[p].label} (usa día/mes, p. ej. 12/10)`)
+        return
+      }
+      const norm = t => t.trim().split('/').map(x => x.padStart(2, '0')).join('-')
+      limpio[p] = { ini: norm(ini), fin: norm(fin) }
+    }
+    await guardarVedas(limpio)
+    setForm(null)
+    setMsg('✓ Fechas de veda guardadas')
+  }
+
+  const valorDe = v => (String(v).includes('/') ? v : aTexto(v))
+
+  return (
+    <div className="card">
+      <h2>Fechas de veda (día/mes)</h2>
+      {Object.entries(vedas).map(([p, v]) => (
+        <div key={p} className="form-row" style={{ alignItems: 'center' }}>
+          <span style={{ width: 108, fontSize: 13, fontWeight: 600 }}>{PERIODOS[p].label}</span>
+          <label>
+            Abre
+            <input type="text" inputMode="numeric" placeholder="dd/mm" value={valorDe(v.ini)}
+              onChange={e => cambia(p, 'ini', e.target.value)} />
+          </label>
+          <label>
+            Cierra
+            <input type="text" inputMode="numeric" placeholder="dd/mm" value={valorDe(v.fin)}
+              onChange={e => cambia(p, 'fin', e.target.value)} />
+          </label>
+        </div>
+      ))}
+      <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0 10px' }}>
+        Orientativas: ajústalas cada año a la resolución de vedas de tu comunidad.
+        Se usan para la cuenta atrás de la pantalla de Registro.
+      </p>
+      <button className="btn secundario" onClick={guardar}>Guardar fechas de veda</button>
+      {msg && <div className="aviso" style={{ marginTop: 10 }}>{msg}</div>}
     </div>
   )
 }

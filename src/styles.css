@@ -337,6 +337,21 @@ textarea { resize: vertical; min-height: 60px; }
 }
 @media (prefers-color-scheme: dark) { .gpx-link { color: #7fb08f; } }
 
+/* ---- Hoy en el coto (sol, luna, vedas) ---- */
+.hoy-coto { padding: 12px 14px; }
+.hc-linea {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.hc-habil { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.hc-vedas { display: flex; flex-direction: column; gap: 4px; }
+.hc-veda { font-size: 12.5px; color: var(--ink-2); }
+.hc-veda.abierta { color: var(--good); font-weight: 600; }
+
 /* ---- Previsión meteo ---- */
 .prev-actual {
   display: flex;

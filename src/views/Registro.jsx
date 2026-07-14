@@ -9,6 +9,7 @@ import { centroDelMapa, meteoDeFecha } from '../utils/meteo.js'
 import { compartirResumen } from '../utils/resumen.js'
 import { cargarMapa } from '../db.js'
 import Prevision from '../components/Prevision.jsx'
+import HoyCoto from '../components/HoyCoto.jsx'
 
 // Tras guardar, intenta anotar la meteo del día en la jornada (sin bloquear)
 async function anotarMeteo(id, fecha) {
@@ -197,6 +198,7 @@ export default function Registro({ editId, onDone, onCancel }) {
 
   return (
     <div>
+      {!editId && <HoyCoto />}
       {!editId && <Prevision />}
       {!editId && (
         <div className={'card gps-card' + (sesion ? ' activa' : '')}>
