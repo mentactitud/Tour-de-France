@@ -18,6 +18,14 @@ db.version(2).stores({
   mapa: 'id'
 })
 
+// v3: control de gastos {fecha, categoria, concepto, importe}
+db.version(3).stores({
+  jornadas: '++id, date, season, period',
+  fotos: '++id, jornadaId',
+  mapa: 'id',
+  gastos: '++id, fecha, categoria'
+})
+
 // Carga el histórico del Excel una sola vez, en el primer arranque.
 // La condición inline sobre import.meta.env se pliega en la compilación:
 // en la variante compartir el histórico personal NO viaja en el paquete.

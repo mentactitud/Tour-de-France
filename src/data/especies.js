@@ -47,6 +47,15 @@ export function temporadaPara(dateStr, period) {
   return `${y - 1}-${String(y % 100).padStart(2, '0')}`
 }
 
+// Año cinegético (1 ago – 31 jul): agrupa gastos y jornadas de una misma
+// temporada de caza. "2026-27" = de agosto 2026 a julio 2027.
+export function anoCinegetico(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00')
+  const y = d.getFullYear()
+  if (d.getMonth() + 1 >= 8) return `${y}-${String((y + 1) % 100).padStart(2, '0')}`
+  return `${y - 1}-${String(y % 100).padStart(2, '0')}`
+}
+
 // Inicio nominal de cada período dentro de la temporada (para el eje del acumulado)
 export function inicioTemporada(period, season) {
   if (period === 'veda_general') {

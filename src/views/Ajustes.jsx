@@ -20,15 +20,19 @@ function descargar(nombre, contenido, tipo) {
 export default function Ajustes() {
   const [msg, setMsg] = useState('')
   const n = useLiveQuery(() => db.jornadas.count(), [])
+  const nGastos = useLiveQuery(() => db.gastos.count(), [])
   const piezas = useLiveQuery(
     async () => (await db.jornadas.toArray()).reduce((a, j) => a + totalPiezas(j), 0), []
   )
 
   async function exportarJSON() {
-    const todas = await db.jornadas.orderBy('date').toArray()
+    const [jornadas, gastos] = await Promise.all([
+      db.jornadas.orderBy('date').toArray(),
+      db.gastos.orderBy('fecha').toArray()
+    ])
     descargar(
       `caza-borges-blanques-${new Date().toISOString().slice(0, 10)}.json`,
-      JSON.stringify(todas, null, 1),
+      JSON.stringify({ version: 2, jornadas, gastos }, null, 1),
       'application/json'
     )
   }
@@ -58,14 +62,24 @@ export default function Ajustes() {
     if (!file) return
     try {
       const data = JSON.parse(await file.text())
-      if (!Array.isArray(data)) throw new Error('formato')
-      const limpias = data
+      // formato antiguo: array plano de jornadas; nuevo: {jornadas, gastos}
+      const brutoJ = Array.isArray(data) ? data : data?.jornadas
+      const brutoG = Array.isArray(data) ? [] : data?.gastos || []
+      if (!Array.isArray(brutoJ)) throw new Error('formato')
+      const limpias = brutoJ
         .filter(j => j && typeof j.date === 'string' && j.period in PERIODOS)
         .map(({ id, ...j }) => j)
-      if (!limpias.length) throw new Error('vacío')
-      if (confirm(`El archivo contiene ${limpias.length} jornadas. ¿Añadirlas a las ${n} actuales?`)) {
-        await db.jornadas.bulkAdd(limpias)
-        setMsg(`✓ ${limpias.length} jornadas importadas`)
+      const gastosLimpios = brutoG
+        .filter(g => g && typeof g.fecha === 'string' && Number.isFinite(g.importe))
+        .map(({ id, ...g }) => g)
+      if (!limpias.length && !gastosLimpios.length) throw new Error('vacío')
+      const partes = []
+      if (limpias.length) partes.push(`${limpias.length} jornadas`)
+      if (gastosLimpios.length) partes.push(`${gastosLimpios.length} gastos`)
+      if (confirm(`El archivo contiene ${partes.join(' y ')}. ¿Añadirlos a los datos actuales?`)) {
+        if (limpias.length) await db.jornadas.bulkAdd(limpias)
+        if (gastosLimpios.length) await db.gastos.bulkAdd(gastosLimpios)
+        setMsg(`✓ Importados ${partes.join(' y ')}`)
       }
     } catch {
       setMsg('⚠ No se pudo leer el archivo (debe ser un JSON exportado por esta app)')
@@ -78,21 +92,42 @@ export default function Ajustes() {
     setMsg(añadidas ? `✓ ${añadidas} jornadas del Excel recuperadas` : 'El histórico del Excel ya está completo')
   }
 
+  async function exportarGastosCSV() {
+    const todos = await db.gastos.orderBy('fecha').toArray()
+    if (!todos.length) { setMsg('No hay gastos registrados todavía.'); return }
+    const filas = todos.map(g =>
+      [g.fecha, g.categoria, `"${(g.concepto || '').replaceAll('"', '""')}"`, String(g.importe).replace('.', ',')].join(';')
+    )
+    descargar(
+      `gastos-caza-${new Date().toISOString().slice(0, 10)}.csv`,
+      '﻿' + ['fecha;categoria;concepto;importe', ...filas].join('\n'),
+      'text/csv;charset=utf-8'
+    )
+  }
+
   async function importarExcel(e) {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
     try {
-      const { jornadas, avisos } = await leerExcel(file)
-      const fechas = `${jornadas[0].date} → ${jornadas[jornadas.length - 1].date}`
-      const piezasNuevas = jornadas.reduce((a, j) => a + totalPiezas(j), 0)
+      const { jornadas, gastos, avisos } = await leerExcel(file)
+      const partes = []
+      if (jornadas.length) {
+        const piezasNuevas = jornadas.reduce((a, j) => a + totalPiezas(j), 0)
+        partes.push(`${jornadas.length} jornadas con ${piezasNuevas} piezas`)
+      }
+      if (gastos.length) {
+        const totalG = gastos.reduce((a, g) => a + g.importe, 0)
+        partes.push(`${gastos.length} gastos (${totalG.toFixed(2)} €)`)
+      }
       if (!confirm(
-        `El Excel contiene ${jornadas.length} jornadas (${fechas}) con ${piezasNuevas} piezas.` +
+        `El Excel contiene ${partes.join(' y ')}.` +
         (avisos.length ? `\n\nAvisos:\n· ${avisos.slice(0, 5).join('\n· ')}` : '') +
-        `\n\n¿Añadirlas a las ${n} jornadas actuales?`
+        `\n\n¿Añadirlos a los datos actuales?`
       )) return
-      await db.jornadas.bulkAdd(jornadas)
-      setMsg(`✓ ${jornadas.length} jornadas importadas del Excel${avisos.length ? ` (${avisos.length} avisos)` : ''}`)
+      if (jornadas.length) await db.jornadas.bulkAdd(jornadas)
+      if (gastos.length) await db.gastos.bulkAdd(gastos)
+      setMsg(`✓ Importados: ${partes.join(' y ')}${avisos.length ? ` (${avisos.length} avisos)` : ''}`)
     } catch (err) {
       setMsg('⚠ ' + err.message)
     }
@@ -116,9 +151,9 @@ export default function Ajustes() {
   }
 
   async function borrarTodo() {
-    if (!confirm(`¿Borrar TODAS las jornadas (${n})? Esta acción no se puede deshacer.`)) return
+    if (!confirm(`¿Borrar TODOS los datos (${n} jornadas, fotos y gastos)? Esta acción no se puede deshacer.`)) return
     if (!confirm('¿Seguro? Se perderá todo lo registrado en este dispositivo.')) return
-    await db.jornadas.clear()
+    await Promise.all([db.jornadas.clear(), db.fotos.clear(), db.gastos.clear()])
     setMsg('Datos borrados. Puedes recuperar el histórico del Excel con el botón de arriba.')
   }
 
@@ -127,10 +162,12 @@ export default function Ajustes() {
       <div className="card">
         <h2>Datos</h2>
         <p style={{ fontSize: 14, color: 'var(--ink-2)', marginBottom: 10 }}>
-          {n ?? '…'} jornadas · {piezas ?? '…'} piezas guardadas en este dispositivo.
+          {n ?? '…'} jornadas · {piezas ?? '…'} piezas
+          {nGastos ? ` · ${nGastos} gastos` : ''} en este dispositivo.
         </p>
         <button className="btn secundario" onClick={exportarJSON}>Exportar copia (JSON)</button>
         <button className="btn secundario" onClick={exportarCSV}>Exportar a Excel (CSV)</button>
+        <button className="btn secundario" onClick={exportarGastosCSV}>Exportar gastos (CSV)</button>
         <label className="btn secundario" style={{ textAlign: 'center', cursor: 'pointer' }}>
           Importar copia JSON
           <input type="file" accept="application/json" onChange={importarJSON} style={{ display: 'none' }} />

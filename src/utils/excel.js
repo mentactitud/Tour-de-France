@@ -1,6 +1,7 @@
 // Importación y plantilla de Excel (.xlsx). SheetJS se carga bajo demanda
 // para no engordar el paquete principal.
 import { ESPECIES, PERIODOS, periodoPorFecha, temporadaPara } from '../data/especies.js'
+import { CATEGORIAS } from '../data/gastos.js'
 
 const norm = s =>
   String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
@@ -34,7 +35,9 @@ export async function leerExcel(file) {
   const XLSX = await import('xlsx')
   const wb = XLSX.read(await file.arrayBuffer(), { cellDates: true })
   const jornadas = []
+  const gastos = []
   const avisos = []
+  const CATEGORIA_POR_NOMBRE = new Map(CATEGORIAS.map(c => [norm(c.id), c.id]))
 
   for (const nombre of wb.SheetNames) {
     const filas = XLSX.utils.sheet_to_json(wb.Sheets[nombre], { header: 1, defval: null })
@@ -50,14 +53,40 @@ export async function leerExcel(file) {
       cartuchos: cab.findIndex(c => c === 'cartuchos' || c.startsWith('cartucho')),
       notas: cab.indexOf('notas'),
       periodo: cab.findIndex(c => c === 'periodo'),
+      importe: cab.indexOf('importe'),
+      categoria: cab.indexOf('categoria'),
+      concepto: cab.indexOf('concepto'),
       especies: []
     }
     cab.forEach((c, i) => {
       const sp = ESPECIE_POR_NOMBRE.get(c)
       if (sp) col.especies.push([i, sp])
     })
+
+    // Hoja de gastos: tiene Importe y ninguna columna de especies
+    if (!col.especies.length && col.importe >= 0) {
+      for (const fila of filas.slice(iCab + 1)) {
+        if (!fila || fila.every(c => c === null || c === '')) continue
+        const bruto = fila[col.fecha]
+        if (norm(bruto) === 'total') continue
+        const fecha = parseFecha(bruto)
+        const importe = parseFloat(String(fila[col.importe] ?? '').replace(',', '.'))
+        if (!fecha || !Number.isFinite(importe) || importe <= 0) {
+          if (bruto !== null && bruto !== '') avisos.push(`Hoja «${nombre}»: fila de gasto no válida («${bruto}»), saltada`)
+          continue
+        }
+        gastos.push({
+          fecha,
+          categoria: CATEGORIA_POR_NOMBRE.get(norm(fila[col.categoria])) || 'Otros',
+          concepto: col.concepto >= 0 ? String(fila[col.concepto] ?? '').trim() : '',
+          importe
+        })
+      }
+      continue
+    }
+
     if (!col.especies.length) {
-      avisos.push(`Hoja «${nombre}»: sin columnas de especies, ignorada`)
+      avisos.push(`Hoja «${nombre}»: sin columnas de especies ni de importe, ignorada`)
       continue
     }
 
@@ -92,9 +121,12 @@ export async function leerExcel(file) {
       })
     }
   }
-  if (!jornadas.length) throw new Error('No se encontró ninguna jornada en el Excel. ' + (avisos[0] || ''))
+  if (!jornadas.length && !gastos.length) {
+    throw new Error('No se encontró ninguna jornada ni gasto en el Excel. ' + (avisos[0] || ''))
+  }
   jornadas.sort((a, b) => (a.date < b.date ? -1 : 1))
-  return { jornadas, avisos }
+  gastos.sort((a, b) => (a.fecha < b.fecha ? -1 : 1))
+  return { jornadas, gastos, avisos }
 }
 
 export async function descargarPlantilla() {
@@ -107,5 +139,12 @@ export async function descargarPlantilla() {
   hoja['!cols'] = [{ wch: 12 }, ...ESPECIES.map(() => ({ wch: 9 })), { wch: 6 }, { wch: 10 }, { wch: 24 }, { wch: 13 }]
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, hoja, 'Jornadas')
+  const hojaGastos = XLSX.utils.aoa_to_sheet([
+    ['Fecha', 'Categoria', 'Concepto', 'Importe'],
+    ['01/09/2025', 'Munición', 'Caja del 24', 89.5],
+    ['15/08/2025', 'Cuota del coto', 'Cuota anual', 350]
+  ])
+  hojaGastos['!cols'] = [{ wch: 12 }, { wch: 16 }, { wch: 24 }, { wch: 10 }]
+  XLSX.utils.book_append_sheet(wb, hojaGastos, 'Gastos')
   XLSX.writeFile(wb, 'plantilla-cuaderno-caza.xlsx')
 }
