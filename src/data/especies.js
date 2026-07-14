@@ -47,12 +47,14 @@ export function temporadaPara(dateStr, period) {
   return `${y - 1}-${String(y % 100).padStart(2, '0')}`
 }
 
-// Año cinegético (1 ago – 31 jul): agrupa gastos y jornadas de una misma
-// temporada de caza. "2026-27" = de agosto 2026 a julio 2027.
+// Año cinegético (1 mar – 28 feb): agrupa gastos y jornadas de una misma
+// temporada de caza, que arranca con el descaste en primavera y termina
+// con el cierre de la Veda General en febrero. "2026-27" = de marzo 2026
+// a febrero 2027. Mismo corte que temporadaPara para la Veda General.
 export function anoCinegetico(dateStr) {
   const d = new Date(dateStr + 'T12:00:00')
   const y = d.getFullYear()
-  if (d.getMonth() + 1 >= 8) return `${y}-${String((y + 1) % 100).padStart(2, '0')}`
+  if (d.getMonth() + 1 >= 3) return `${y}-${String((y + 1) % 100).padStart(2, '0')}`
   return `${y - 1}-${String(y % 100).padStart(2, '0')}`
 }
 
