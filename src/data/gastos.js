@@ -7,6 +7,7 @@ export const CATEGORIAS = [
   { id: 'Equipo', emoji: '🎒' },
   { id: 'Perros', emoji: '🐕' },
   { id: 'Desplazamiento', emoji: '🚙' },
+  { id: 'Alojamiento', emoji: '🛏️' },
   { id: 'Otros', emoji: '📦' }
 ]
 
