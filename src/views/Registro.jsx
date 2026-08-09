@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { PERIODOS, periodoPorFecha, temporadaPara } from '../data/especies.js'
-import { gps } from '../gps.js'
+import { gps, estadoGps } from '../gps.js'
 import { parseGPX } from '../utils/geo.js'
 import { comprimirFoto, guardarFotos, compartirFotos } from '../utils/fotos.js'
 import { centroDelMapa, meteoDeFecha } from '../utils/meteo.js'
@@ -60,10 +60,10 @@ export default function Registro({ editId, onDone, onCancel }) {
 
   useEffect(() => gps.subscribe(setSesion), [])
 
-  // cronómetro en vivo mientras hay sesión GPS
+  // cronómetro y estado del GPS en vivo mientras hay sesión
   useEffect(() => {
     if (!sesion) return
-    const t = setInterval(() => setTic(x => x + 1), 5000)
+    const t = setInterval(() => setTic(x => x + 1), 3000)
     return () => clearInterval(t)
   }, [sesion])
 
@@ -194,6 +194,7 @@ export default function Registro({ editId, onDone, onCancel }) {
   const totalDia = Object.values(counts).reduce((a, b) => a + b, 0)
   const nCart = cartuchos === '' ? null : parseInt(cartuchos, 10)
   const minutos = sesion ? Math.round((Date.now() - sesion.startTs) / 60000) : 0
+  const estado = estadoGps(sesion)
   const nFotos = (fotosGuardadas?.length || 0) + fotosNuevas.length
 
   return (
@@ -226,6 +227,7 @@ export default function Registro({ editId, onDone, onCancel }) {
                 <span>{fmtDuracion(minutos)}</span>
                 <span>{(Math.round(sesion.km * 10) / 10).toFixed(1)} km</span>
               </div>
+              {estado && <div className={'gps-estado ' + estado.nivel}>{estado.texto}</div>}
               <p className="gps-nota">
                 Cada <b>+1</b> guarda también el punto del lance. Al terminar se
                 rellenan los km y la duración.
@@ -242,10 +244,20 @@ export default function Registro({ editId, onDone, onCancel }) {
         </div>
       )}
 
-      {pendGps && (
+      {pendGps && pendGps.km > 0 && (
         <div className="aviso">
-          ✓ GPS registrado: {pendGps.km ?? '?'} km
+          ✓ GPS registrado: {pendGps.km} km
           {pendGps.duracion ? ` en ${fmtDuracion(pendGps.duracion)}` : ''} — se guardará con la jornada.
+        </div>
+      )}
+      {pendGps && !(pendGps.km > 0) && (
+        <div className="aviso">
+          ⚠ <b>El GPS no registró recorrido</b> ({pendGps.puntos || 0} puntos
+          {pendGps.duracion ? ` en ${fmtDuracion(pendGps.duracion)}` : ''}).
+          {pendGps.err?.code === 1
+            ? ' El permiso de ubicación estaba denegado.'
+            : ' Suele pasar si el móvil llevaba la pantalla apagada o la app en segundo plano: Android detiene el GPS.'}
+          {' '}Escribe los km a mano, o importa el GPX del reloj con el botón de arriba.
         </div>
       )}
 
