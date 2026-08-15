@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mkdir -p dist/.well-known && cp public/.well-known/assetlinks.json dist/.well-known/assetlinks.json && touch dist/.nojekyll",
+    "build": "vite build && node scripts/copy-well-known.js",
     "preview": "vite preview",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android"
