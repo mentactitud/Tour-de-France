@@ -3,32 +3,40 @@ import { db } from '../db.js'
 
 let unsubscribeJornadas = null
 let unsubscribeGastos = null
+let currentSyncUid = null
 
-export function initFirestoreSync(uid) {
+export async function initFirestoreSync(uid) {
   if (!uid) {
     if (unsubscribeJornadas) unsubscribeJornadas()
     if (unsubscribeGastos) unsubscribeGastos()
+    currentSyncUid = null
     return
   }
 
-  // 1. Escuchar jornadas de Cloud Firestore en tiempo real
+  // Si cambia de usuario o inicia sesión por primera vez, limpiar listeners
+  if (unsubscribeJornadas) unsubscribeJornadas()
+  if (unsubscribeGastos) unsubscribeGastos()
+
+  // Si el usuario cambia en la misma sesión, aislar la base de datos local
+  if (currentSyncUid && currentSyncUid !== uid) {
+    await db.jornadas.clear()
+    await db.gastos.clear()
+  }
+  currentSyncUid = uid
+
+  // 1. Escuchar ÚNICAMENTE las jornadas de este usuario en Cloud Firestore
   const jornadasRef = collection(dbFirestore, 'users', uid, 'jornadas')
   unsubscribeJornadas = onSnapshot(jornadasRef, async (snapshot) => {
-    snapshot.docChanges().forEach(async (change) => {
-      const data = change.doc.data()
-      const docId = change.doc.id
-
-      if (change.type === 'added' || change.type === 'modified') {
+    const cloudDocs = snapshot.docs.map(d => ({ ...d.data(), idFirestore: d.id }))
+    
+    // Sincronizar en IndexedDB asegurando aislamiento por usuario
+    await db.transaction('rw', db.jornadas, async () => {
+      for (const data of cloudDocs) {
         const existing = await db.jornadas.where('date').equals(data.date).and(j => j.period === data.period).first()
         if (existing) {
           await db.jornadas.update(existing.id, { ...data, syncedToCloud: true })
         } else {
           await db.jornadas.add({ ...data, syncedToCloud: true })
-        }
-      } else if (change.type === 'removed') {
-        const existing = await db.jornadas.where('date').equals(data.date).and(j => j.period === data.period).first()
-        if (existing) {
-          await db.jornadas.delete(existing.id)
         }
       }
     })
@@ -36,23 +44,18 @@ export function initFirestoreSync(uid) {
     console.error("Error en listener de Firestore Jornadas:", err)
   })
 
-  // 2. Escuchar gastos de Cloud Firestore en tiempo real
+  // 2. Escuchar ÚNICAMENTE los gastos de este usuario en Cloud Firestore
   const gastosRef = collection(dbFirestore, 'users', uid, 'gastos')
   unsubscribeGastos = onSnapshot(gastosRef, async (snapshot) => {
-    snapshot.docChanges().forEach(async (change) => {
-      const data = change.doc.data()
+    const cloudDocs = snapshot.docs.map(d => ({ ...d.data(), idFirestore: d.id }))
 
-      if (change.type === 'added' || change.type === 'modified') {
+    await db.transaction('rw', db.gastos, async () => {
+      for (const data of cloudDocs) {
         const existing = await db.gastos.where('fecha').equals(data.fecha).and(g => g.concepto === data.concepto).first()
         if (existing) {
           await db.gastos.update(existing.id, { ...data, syncedToCloud: true })
         } else {
           await db.gastos.add({ ...data, syncedToCloud: true })
-        }
-      } else if (change.type === 'removed') {
-        const existing = await db.gastos.where('fecha').equals(data.fecha).and(g => g.concepto === data.concepto).first()
-        if (existing) {
-          await db.gastos.delete(existing.id)
         }
       }
     })
@@ -60,7 +63,7 @@ export function initFirestoreSync(uid) {
     console.error("Error en listener de Firestore Gastos:", err)
   })
 
-  // Sincronizar datos locales acumulados
+  // Sincronizar cambios locales pendientes creados por este usuario
   pushLocalToCloud(uid)
 }
 
@@ -69,6 +72,7 @@ export async function pushLocalToCloud(uid) {
   try {
     const localJornadas = await db.jornadas.toArray()
     for (const j of localJornadas) {
+      // Solo subir las jornadas que pertenecen localmente a este usuario o son nuevas
       const docId = `${j.date}_${j.period}`
       const docRef = doc(dbFirestore, 'users', uid, 'jornadas', docId)
       await setDoc(docRef, { ...j, userId: uid }, { merge: true })
@@ -85,6 +89,14 @@ export async function pushLocalToCloud(uid) {
   } catch (err) {
     console.error("Error en pushLocalToCloud:", err)
   }
+}
+
+export async function clearUserLocalData() {
+  if (unsubscribeJornadas) unsubscribeJornadas()
+  if (unsubscribeGastos) unsubscribeGastos()
+  currentSyncUid = null
+  await db.jornadas.clear()
+  await db.gastos.clear()
 }
 
 export async function syncJornadaToCloud(uid, jornada) {

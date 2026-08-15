@@ -57,6 +57,8 @@ export function AuthProvider({ children }) {
   async function logout() {
     setAuthError(null)
     try {
+      const { clearUserLocalData } = await import('../utils/firestoreSync.js')
+      await clearUserLocalData()
       return await signOut(auth)
     } catch (err) {
       console.error("Error en logout:", err)
