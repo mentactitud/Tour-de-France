@@ -81,6 +81,23 @@ function onPos(pos) {
   sesion.points.push(p)
   persistir()
   avisar()
+
+  // Transmitir posición GPS en tiempo real a Firestore si el cazador ha iniciado sesión
+  try {
+    import('./firebase.js').then(({ auth, dbFirestore, doc, setDoc }) => {
+      const user = auth.currentUser
+      if (user) {
+        const hunterRef = doc(dbFirestore, 'liveHunters', user.uid)
+        setDoc(hunterRef, {
+          uid: user.uid,
+          name: user.displayName || user.email || 'Cazador',
+          lat: p[0],
+          lng: p[1],
+          updatedAt: Date.now()
+        }, { merge: true }).catch(() => {})
+      }
+    }).catch(() => {})
+  } catch {}
 }
 
 // Los errores del GPS ya no se tragan: se muestran en la tarjeta de la jornada

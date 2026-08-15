@@ -51,8 +51,22 @@ export default function Gastos() {
     if (!Number.isFinite(importe) || importe <= 0) { setMsg('⚠ Pon un importe válido'); return }
     if (!form.fecha) { setMsg('⚠ Falta la fecha'); return }
     const gasto = { fecha: form.fecha, categoria: form.categoria, concepto: form.concepto.trim(), importe }
-    if (editId) await db.gastos.update(editId, gasto)
-    else await db.gastos.add(gasto)
+    let id = editId
+    if (editId) {
+      await db.gastos.update(editId, gasto)
+    } else {
+      id = await db.gastos.add(gasto)
+    }
+
+    try {
+      const { auth } = await import('../firebase.js')
+      const user = auth.currentUser
+      if (user) {
+        const { syncGastoToCloud } = await import('../utils/firestoreSync.js')
+        await syncGastoToCloud(user.uid, { id, ...gasto })
+      }
+    } catch {}
+
     setAno(anoCinegetico(form.fecha))
     setForm({ ...FORM_VACIO, fecha: hoy() })
     setEditId(null)
@@ -69,6 +83,14 @@ export default function Gastos() {
     e.stopPropagation()
     if (confirm(`¿Borrar el gasto de ${EUR.format(g.importe)} (${g.categoria})?`)) {
       await db.gastos.delete(g.id)
+      try {
+        const { auth } = await import('../firebase.js')
+        const user = auth.currentUser
+        if (user) {
+          const { deleteGastoFromCloud } = await import('../utils/firestoreSync.js')
+          await deleteGastoFromCloud(user.uid, g.fecha, g.concepto)
+        }
+      } catch {}
       if (editId === g.id) { setEditId(null); setForm({ ...FORM_VACIO, fecha: hoy() }) }
     }
   }

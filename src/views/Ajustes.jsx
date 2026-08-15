@@ -7,6 +7,7 @@ import { VEDAS_DEFECTO } from '../data/vedas.js'
 import { leerExcel, descargarPlantilla } from '../utils/excel.js'
 import { COMPARTIR } from '../variante.js'
 import ImportarKML from '../components/ImportarKML.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 function descargar(nombre, contenido, tipo) {
   const blob = new Blob([contenido], { type: tipo })
@@ -18,7 +19,7 @@ function descargar(nombre, contenido, tipo) {
   URL.revokeObjectURL(url)
 }
 
-export default function Ajustes() {
+export default function Ajustes({ onOpenAuth }) {
   const [msg, setMsg] = useState('')
   const n = useLiveQuery(() => db.jornadas.count(), [])
   const nGastos = useLiveQuery(() => db.gastos.count(), [])
@@ -301,3 +302,69 @@ function EstadoMapa() {
     </p>
   )
 }
+
+function AccountCard({ onOpenAuth, setMsg }) {
+  const [syncing, setSyncing] = useState(false)
+  const { currentUser: user } = useAuth()
+
+  async function handleManualSync() {
+    if (!user) {
+      if (onOpenAuth) onOpenAuth()
+      return
+    }
+    setSyncing(true)
+    try {
+      const { pushLocalToCloud } = await import('../utils/firestoreSync.js')
+      await pushLocalToCloud(user.uid)
+      setMsg('✓ Datos sincronizados manualmente con Cloud Firestore')
+    } catch (err) {
+      setMsg('⚠ Error sincronizando con Firestore')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  return (
+    <div className="card account-card">
+      <h2>Cuenta y Sincronización en la Nube</h2>
+      {user ? (
+        <div>
+          <div className="account-info-row">
+            <div className="user-avatar-small">
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="Avatar" />
+              ) : (
+                <span>{(user.displayName || user.email || 'C')[0].toUpperCase()}</span>
+              )}
+            </div>
+            <div>
+              <div className="account-name">{user.displayName || 'Cazador Registrado'}</div>
+              <div className="account-email">{user.email}</div>
+            </div>
+          </div>
+          <p style={{ fontSize: 13, color: 'var(--ink-2)', margin: '10px 0' }}>
+            Tus jornadas y gastos se están sincronizando en tiempo real con Cloud Firestore.
+          </p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn secundario" onClick={handleManualSync} disabled={syncing}>
+              {syncing ? 'Sincronizando…' : 'Forzar sincronización ahora'}
+            </button>
+            <button className="btn secundario" onClick={onOpenAuth}>
+              Gestionar cuenta
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <p style={{ fontSize: 13, color: 'var(--ink-2)', marginBottom: 12 }}>
+            Conecta tu cuenta de correo electrónico para respaldar automáticamente todas tus jornadas, fotos y gastos en Cloud Firestore.
+          </p>
+          <button className="btn primario" onClick={onOpenAuth}>
+            Iniciar Sesión / Crear Cuenta
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
