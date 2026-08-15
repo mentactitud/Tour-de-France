@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "es.borgesblanques.cazatracker",
+      "sha256_cert_fingerprints": [
+        "08:D8:73:95:E9:FF:A6:D5:FF:1A:2E:A9:31:C3:C2:83:86:D7:40:E6:3F:CC:C1:CB:87:D4:02:6A:28:23:B3:E2"
+      ]
+    }
+  }
+]
