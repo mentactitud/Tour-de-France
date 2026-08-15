@@ -23,6 +23,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Asegurar que .well-known y .nojekyll estén en dist
+        run: |
+          mkdir -p dist/.well-known
+          cp public/.well-known/assetlinks.json dist/.well-known/assetlinks.json
+          touch dist/.nojekyll
       - name: Construir variante compartir (sin datos personales)
         run: VITE_VARIANTE=compartir npx vite build --outDir dist/compartir
       - name: Comprobar que la variante compartir no lleva el histórico

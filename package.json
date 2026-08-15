@@ -5,19 +5,27 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && mkdir -p dist/.well-known && cp public/.well-known/assetlinks.json dist/.well-known/assetlinks.json && touch dist/.nojekyll",
+    "preview": "vite preview",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/geolocation": "^6.1.0",
+    "@capacitor/status-bar": "^6.0.2",
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "fflate": "^0.8.3",
+    "firebase-admin": "^14.2.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.3.5",
     "vite-plugin-pwa": "^0.21.1"
