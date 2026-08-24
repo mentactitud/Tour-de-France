@@ -130,16 +130,22 @@ export default function Registro({ editId, onDone, onCancel }) {
     const files = [...(e.target.files || [])]
     e.target.value = ''
     if (!files.length) return
-    try {
-      const nuevas = []
-      for (const f of files) {
+    // Al subir varias de la galería, una que falle (un HEIC que el navegador
+    // no sabe abrir) no debe tirar abajo las demás.
+    const nuevas = []
+    const fallidas = []
+    for (const f of files) {
+      try {
         const blob = await comprimirFoto(f)
         nuevas.push({ blob, url: URL.createObjectURL(blob) })
+      } catch {
+        fallidas.push(f.name)
       }
-      setFotosNuevas(prev => [...prev, ...nuevas])
-    } catch (err) {
-      setMsgFoto('⚠ ' + err.message)
     }
+    if (nuevas.length) setFotosNuevas(prev => [...prev, ...nuevas])
+    if (!fallidas.length) setMsgFoto('')
+    else if (!nuevas.length) setMsgFoto(`⚠ No se pudo abrir ${fallidas.length === 1 ? 'la foto' : 'ninguna de las fotos'}. Prueba a compartirlas desde la galería en JPG.`)
+    else setMsgFoto(`✓ Añadidas ${nuevas.length}. No se pudo abrir: ${fallidas.join(', ')}`)
   }
 
   async function borrarFotoGuardada(id) {
@@ -345,9 +351,15 @@ export default function Registro({ editId, onDone, onCancel }) {
               >✕</button>
             </div>
           ))}
-          <label className="foto-add">
-            📷
-            <input type="file" accept="image/*" capture="environment" multiple onChange={anadirFotos} style={{ display: 'none' }} />
+          <label className="foto-add" aria-label="Hacer una foto ahora">
+            <span className="ico">📷</span>
+            <span className="txt">Cámara</span>
+            <input type="file" accept="image/*" capture="environment" onChange={anadirFotos} style={{ display: 'none' }} />
+          </label>
+          <label className="foto-add" aria-label="Subir fotos de la galería">
+            <span className="ico">🖼️</span>
+            <span className="txt">Galería</span>
+            <input type="file" accept="image/*" multiple onChange={anadirFotos} style={{ display: 'none' }} />
           </label>
         </div>
         {nFotos > 0 && (

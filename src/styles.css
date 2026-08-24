@@ -435,14 +435,17 @@ textarea { resize: vertical; min-height: 60px; }
 .foto-add {
   aspect-ratio: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  gap: 2px;
   border: 2px dashed var(--baseline);
   border-radius: 10px;
   cursor: pointer;
   color: var(--muted);
 }
+.foto-add .ico { font-size: 24px; line-height: 1; }
+.foto-add .txt { font-size: 11px; font-weight: 600; }
 
 /* ---- Mapa ---- */
 .mapa-wrap { position: relative; margin: 0 -12px; }
